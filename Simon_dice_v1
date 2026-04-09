@@ -1,0 +1,126 @@
+// tColores (enumerado)
+const tColores = {
+  Rojo:   0,
+  Verde:  1,
+  Azul:   2,
+  Dorado: 3,
+};
+
+const MAX_COLORES_SEQ = 10;
+
+const readline = require("readline");
+
+function pregunta(rl, texto) {
+  return new Promise((resolve) => {
+    rl.question(texto, resolve);
+  });
+}
+
+function charToColor(letra) {
+  if (letra == "r" || letra == "R") return tColores.Rojo;
+  if (letra == "v" || letra == "V") return tColores.Verde;
+  if (letra == "a" || letra == "A") return tColores.Azul;
+  if (letra == "d" || letra == "D") return tColores.Dorado;
+  return null;
+}
+
+function intToColor(numero) {
+  switch (numero) {
+    case tColores.Rojo:   return "Rojo";
+    case tColores.Verde:  return "Verde";
+    case tColores.Azul:   return "Azul";
+    case tColores.Dorado: return "Dorado";
+    default: return null;
+  }
+}
+
+function generarSecuencia(numColores) {
+  let secuencia = [];
+  for (let i = 0; i < MAX_COLORES_SEQ; i++) {
+    let numeroRandom = Math.floor(Math.random() * (numColores + 1));
+    let color = intToColor(numeroRandom);
+    secuencia.push(color);
+  }
+  return secuencia;
+}
+
+function comprobarColor(secuenciaColores, indice, color) {
+  return secuenciaColores[indice] === color;
+}
+
+function mostrarSecuencia(secuenciaColores, numero, rl) {
+  return new Promise((resolve) => {
+    let texto = "Secuencia numero " + numero + ": ";
+    for (let i = 0; i < numero; i++) {
+      texto += secuenciaColores[i];
+      if (i < numero - 1) texto += " - ";
+    }
+    console.log(texto);
+    rl.question("Memoriza la secuencia y pulsa Enter para continuar...", () => {
+      console.clear();
+      resolve();
+    });
+  });
+}
+
+async function pedirColor(rl, numero) {
+  let color = null;
+  while (color == null) {
+    let letra = await pregunta(rl, "Color " + numero + ": ");
+    color = charToColor(letra);
+    if (color == null) {
+      console.log("Color no valido");
+    }
+  }
+  return color;
+}
+
+async function comenzarJuego(nombre, rl) {
+  let secuencia = generarSecuencia(3);
+  let longitudActual = 3;
+  let jugando = true;
+
+  while (jugando && longitudActual <= MAX_COLORES_SEQ) {
+    await mostrarSecuencia(secuencia, longitudActual, rl);
+
+    console.log(nombre + ", introduce la secuencia de " + longitudActual + " colores:");
+    console.log("(R = Rojo, V = Verde, A = Azul, D = Dorado)");
+
+    for (let i = 0; i < longitudActual; i++) {
+      let colorUsuario = await pedirColor(rl, i + 1);
+      if (!comprobarColor(secuencia, i, colorUsuario)) {
+        console.log("Has fallado la secuencia numero " + longitudActual + ".");
+        jugando = false;
+        break;
+      }
+    }
+
+    if (jugando) {
+      console.log("Enhorabuena, has acertado la secuencia numero " + longitudActual + ".");
+      longitudActual++;
+    }
+  }
+
+  if (longitudActual > MAX_COLORES_SEQ) {
+    console.log("Has ganado");
+  }
+}
+
+async function main() {
+  process.stdin.resume();
+  const rl = readline.createInterface({
+    input:  process.stdin,
+    output: process.stdout,
+  });
+
+  console.log("Bienvenido a Simon dice!");
+  const nombre = await pregunta(rl, "¿Cual es tu nombre? ");
+  console.log("Hola " + nombre + ", pulsa Enter para empezar a jugar.");
+
+  await pregunta(rl, "");
+  await comenzarJuego(nombre, rl);
+
+  rl.close();
+}
+
+main().catch(console.error);
