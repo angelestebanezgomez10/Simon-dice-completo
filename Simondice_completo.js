@@ -151,8 +151,7 @@ async function main() {
   const nombre = await pregunta(rl, "¿Cuál es tu nombre? ");
   console.log(`Hola ${nombre}, pulsa una tecla para empezar a jugar.`);
 
-  await pregunta(rl, "");
-  await comenzarJuego(nombre, rl);
+  await menuPrincipal(nombre, rl);
 
   rl.close();
 }
@@ -291,5 +290,29 @@ async function comenzarJuegoV2(nombre, modo, rl) {
  
     if (jugando === true) {
         console.log("Has ganado");
+    }
+}
+
+async function menuPrincipal(nombre, rl) {
+    let opcion = -1;
+ 
+    while (opcion !== 0) {
+        console.log("\nElija una opción para continuar:");
+        console.log("0: Salir.");
+        console.log("1: Jugar en modo sencillo.");
+        console.log("2: Jugar en modo difícil.");
+ 
+        let respuesta = await pregunta(rl, "Opción: ");
+        opcion = parseInt(respuesta);
+ 
+        if (opcion === 0) {
+            console.log("¡Hasta luego!");
+        } else if (opcion === 1) {
+            await comenzarJuegoV2(nombre, tModo.Sencillo, rl);
+        } else if (opcion === 2) {
+            await comenzarJuegoV2(nombre, tModo.Dificil, rl);
+        } else {
+            console.log("Opción no válida. Inténtalo de nuevo.");
+        }
     }
 }
