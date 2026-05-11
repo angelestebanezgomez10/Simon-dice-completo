@@ -227,3 +227,69 @@ function utilizarAyuda(secuenciaColores, indice, numAyudas) {
         return false;
     }
 }
+
+async function comenzarJuegoV2(nombre, modo, rl) {
+    let numColores = MAX_COLORES_FACIL;
+    let leyenda = "(R = Rojo, V = Verde, A = Azul, D = Dorado, x = Ayuda)";
+ 
+    if (modo === tModo.Dificil) {
+        numColores = MAX_COLORES_DIFICIL;
+        leyenda = "(R = Rojo, V = Verde, A = Azul, D = Dorado, B = Blanco, M = Marrón, N = Naranja, x = Ayuda)";
+    }
+ 
+    let secuencia = generarSecuenciaV2(modo, numColores);
+    let longitudActual = 3;
+    let numSecuencia = 1;
+    let jugando = true;
+    let numAyudas = [MAX_AYUDAS];
+ 
+    while (jugando === true && longitudActual <= MAX_COLORES_SEQ) {
+ 
+        mostrarSecuenciaV2(secuencia, longitudActual, numSecuencia);
+ 
+        await pregunta(rl, "");
+ 
+        console.clear();
+ 
+        console.log("Ayudas disponibles: " + numAyudas[0]);
+        console.log(nombre + ", introduce la secuencia de " + longitudActual + " colores:");
+        console.log(leyenda);
+ 
+        let i = 0;
+ 
+        while (i < longitudActual && jugando === true) {
+ 
+            let colorUsuario = null;
+ 
+            while (colorUsuario === null) {
+                let resp = await pregunta(rl, "Color " + (i + 1) + ": ");
+                let resultado = charToColorV2(resp);
+ 
+                if (resultado === "ayuda") {
+                    utilizarAyuda(secuencia, i, numAyudas);
+                } else if (resultado === null) {
+                    console.log("Color no válido");
+                } else {
+                    colorUsuario = resultado;
+                }
+            }
+ 
+            if (comprobarColor(secuencia, i, colorUsuario) === false) {
+                console.log("Has fallado la secuencia numero " + numSecuencia + ".");
+                jugando = false;
+            }
+ 
+            i = i + 1;
+        }
+ 
+        if (jugando === true) {
+            console.log("Enhorabuena, has acertado la secuencia numero " + numSecuencia + ".");
+            longitudActual = longitudActual + 1;
+            numSecuencia = numSecuencia + 1;
+        }
+    }
+ 
+    if (jugando === true) {
+        console.log("Has ganado");
+    }
+}
