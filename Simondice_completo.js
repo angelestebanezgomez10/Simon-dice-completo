@@ -217,3 +217,13 @@ function mostrarSecuenciaV2(secuenciaColores, numero, numSecuencia) {
     console.log("Memoriza la secuencia y pulsa Enter para continuar...");
 }
  
+function utilizarAyuda(secuenciaColores, indice, numAyudas) {
+    if (numAyudas[0] > 0) {
+        numAyudas[0] = numAyudas[0] - 1;
+        console.log("El siguiente color es el " + mostrarColorV2(secuenciaColores[indice]) + ". Te quedan " + numAyudas[0] + " ayudas!");
+        return true;
+    } else {
+        console.log("No dispones de más ayudas.");
+        return false;
+    }
+}
